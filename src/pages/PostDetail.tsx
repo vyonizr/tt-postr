@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react'
 import { faker } from '@faker-js/faker'
 import { useTranslation } from 'react-i18next'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { formatDistanceToNow } from 'date-fns'
 
 import { useParams, Link } from 'react-router-dom'
-import { feedState } from '../recoil/atoms/feedAtom'
+import { feedState, userLocationState } from '../recoil/atoms/feedAtom'
 import { PostFeed } from '../types'
 import { handleDateFnLocale } from '../utils'
 
@@ -17,6 +17,7 @@ export default function PostDetail() {
 
   const { postId } = useParams()
   const [feed, setFeed] = useRecoilState(feedState)
+  const location = useRecoilValue(userLocationState)
   const [body, setBody] = useState('')
 
   const randomUsername = useMemo(() => {
@@ -40,8 +41,9 @@ export default function PostDetail() {
                 id: faker.string.uuid(),
                 body,
                 created_at: new Date().getTime(),
-                latitude: faker.location.latitude(),
-                longitude: faker.location.longitude(),
+                latitude: location.latitude !== null ? location.latitude : null,
+                longitude:
+                  location.longitude !== null ? location.longitude : null,
                 post_id: post.id,
                 username: randomUsername,
               },
@@ -77,6 +79,19 @@ export default function PostDetail() {
                 addSuffix: true,
               })}
             </small>
+            {postDetail.latitude !== null && postDetail.longitude !== null ? (
+              <Link
+                to={`https://www.google.com/maps/search/?api=1&query=${postDetail.latitude},${postDetail.longitude}`}
+                target='_blank'
+                rel='noreferrer'
+              >
+                <small>
+                  {`(${postDetail.latitude}, ${postDetail.longitude})`}
+                </small>
+              </Link>
+            ) : (
+              <small>(Unknown Location)</small>
+            )}
           </div>
           <div className='mt-4'>
             <TextArea

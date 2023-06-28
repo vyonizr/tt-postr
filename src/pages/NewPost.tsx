@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { faker } from '@faker-js/faker'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 
 import { DUMMY_URL, MAX_CHARACTERS, TOAST_OPTIONS } from '../constants'
-import { feedState } from '../recoil/atoms/feedAtom'
+import { feedState, userLocationState } from '../recoil/atoms/feedAtom'
 
 import TextArea from '../components/TextArea'
 
@@ -15,6 +15,7 @@ export default function NewPost() {
   const navigate = useNavigate()
 
   const [feed, setFeed] = useRecoilState(feedState)
+  const location = useRecoilValue(userLocationState)
 
   const [body, setBody] = useState('')
 
@@ -32,8 +33,8 @@ export default function NewPost() {
             body,
             created_at: new Date().getTime(),
             username: randomUsername,
-            latitude: faker.location.latitude(),
-            longitude: faker.location.longitude(),
+            latitude: location.latitude !== null ? location.latitude : null,
+            longitude: location.longitude !== null ? location.longitude : null,
             replies: [],
           },
         ]

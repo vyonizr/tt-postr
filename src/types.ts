@@ -2,8 +2,8 @@ export interface Post {
   id: string
   username: string
   body: string
-  latitude: number
-  longitude: number
+  latitude: number | null
+  longitude: number | null
   created_at: number
 }
 

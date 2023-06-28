@@ -1,10 +1,14 @@
+import { useEffect } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { RecoilRoot } from 'recoil'
+import { useSetRecoilState } from 'recoil'
 import { I18nextProvider } from 'react-i18next'
 import { ToastContainer } from 'react-toastify'
+import { useGeolocation } from 'react-use'
 import 'react-toastify/dist/ReactToastify.css'
 
 import i18n from './i18n'
+
+import { userLocationState } from './recoil/atoms/feedAtom'
 
 import Home from './pages/Home'
 import PostDetail from './pages/PostDetail'
@@ -29,15 +33,31 @@ const router = createBrowserRouter([
 ])
 
 function App() {
+  const location = useGeolocation()
+  const setLocation = useSetRecoilState(userLocationState)
+
+  useEffect(() => {
+    if (
+      location.error !== null &&
+      location.latitude !== null &&
+      location.longitude !== null
+    ) {
+      setLocation({
+        latitude: location.latitude,
+        longitude: location.longitude,
+      })
+    }
+  }, [location, setLocation])
+
+  console.log(location)
+
   return (
-    <RecoilRoot>
-      <I18nextProvider i18n={i18n}>
-        <main className='flex min-h-screen w-full flex-col items-center p-4'>
-          <RouterProvider router={router} />
-        </main>
-        <ToastContainer />
-      </I18nextProvider>
-    </RecoilRoot>
+    <I18nextProvider i18n={i18n}>
+      <main className='flex min-h-screen w-full flex-col items-center p-4'>
+        <RouterProvider router={router} />
+      </main>
+      <ToastContainer />
+    </I18nextProvider>
   )
 }
 

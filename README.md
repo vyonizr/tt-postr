@@ -53,3 +53,4 @@ Table replies {
 - The post does not support new lines. The user can only type a single line of text.
 - Data stored in IndexedDB is not automatically deleted, so it will be increasing in size as the user uses the app. This is beyond the scope of my implementation.
 - Deutsch translations are straight from Google Translate, so they might not be accurate. This is beyond the scope of my implementation.
+- When using `useGeolocation` hook in development environment,remove `React.StrictMode` wrapper in `main.tsx` in order to obtain user's location. Otherwise it would return `null` both on latitude and longitude values. See https://github.com/streamich/react-use/issues/2380#issuecomment-1355538284
