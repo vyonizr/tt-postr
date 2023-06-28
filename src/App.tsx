@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { useSetRecoilState, useRecoilState } from 'recoil'
 import { ToastContainer } from 'react-toastify'
@@ -8,9 +8,9 @@ import 'react-toastify/dist/ReactToastify.css'
 
 import { userLocationState, onlineAtomState } from './recoil/atoms/feedAtom'
 
-import Home from './pages/Home'
-import PostDetail from './pages/PostDetail'
-import NewPost from './pages/NewPost'
+const Home = lazy(() => import('./pages/Home'))
+const PostDetail = lazy(() => import('./pages/PostDetail'))
+const NewPost = lazy(() => import('./pages/NewPost'))
 
 // Configure i18n Provider: https://stackoverflow.com/a/68509726
 // i18next automatically set localeStorage
@@ -59,7 +59,7 @@ function App() {
   }, [onlineState, setOnline])
 
   return (
-    <>
+    <Suspense fallback={<div />}>
       <main className='flex min-h-screen w-full flex-col items-center p-4'>
         <RouterProvider router={router} />
       </main>
@@ -71,7 +71,7 @@ function App() {
         <p>{t('offline')}</p>
       </div>
       <ToastContainer />
-    </>
+    </Suspense>
   )
 }
 
