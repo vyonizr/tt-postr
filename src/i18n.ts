@@ -21,6 +21,12 @@ i18n
           backToHome: 'Back to Home',
           subheading: 'Post Anonymously',
           createNewPost: 'Create New Post',
+          offline: 'You are offline',
+          backOnline: 'You are back online!',
+          toast: {
+            postCreated: 'Post created!',
+            generalError: 'Something went wrong',
+          },
         },
       },
       id: {
@@ -35,6 +41,12 @@ i18n
           backToHome: 'Kembali ke Beranda',
           subheading: 'Posting Secara Anonim',
           createNewPost: 'Buat Postingan Baru',
+          offline: 'Kamu sedang offline',
+          backOnline: 'Kamu sudah online!',
+          toast: {
+            postCreated: 'Postingan berhasil dibuat!',
+            generalError: 'Terjadi kesalahan',
+          },
         },
       },
       de: {
@@ -49,6 +61,12 @@ i18n
           backToHome: 'Zurück zur Startseite',
           subheading: 'Anonym posten',
           createNewPost: 'Neuen Beitrag erstellen',
+          offline: 'Du bist offline',
+          backOnline: 'Du bist wieder online!',
+          toast: {
+            postCreated: 'Beitrag erstellt!',
+            generalError: 'Etwas ist schief gelaufen',
+          },
         },
       },
     },

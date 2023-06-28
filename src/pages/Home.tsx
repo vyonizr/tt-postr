@@ -1,16 +1,19 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useLiveQuery } from 'dexie-react-hooks'
+// import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil'
 import { formatDistanceToNow } from 'date-fns'
-import { useTranslation, Trans } from 'react-i18next'
+import {
+  useTranslation,
+//  Trans
+  } from 'react-i18next'
 
-import { db } from '../db'
+// import { db } from '../db'
 import { DUMMY_URL, LANGUAGES } from '../constants'
 import { PostFeed } from '../types'
 import { generateRandomPosts, handleDateFnLocale } from '../utils'
 
-import { feedState, oldestTimestampInFeed } from '../recoil/atoms/feedAtom'
+import { feedState, oldestTimestampInFeed,onlineAtomState } from '../recoil/atoms/feedAtom'
 import { sortedFeedState } from '../recoil/selectors/feedSelector'
 
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
@@ -36,6 +39,7 @@ export default function Home() {
   // const postsz = useLiveQuery(() => getPosts())
 
   const feed = useRecoilValue(sortedFeedState)
+  const online = useRecoilValue(onlineAtomState)
   const setFeed = useSetRecoilState(feedState)
   const [oldestPostTime, setOldestPostTime] = useRecoilState(
     oldestTimestampInFeed
@@ -47,17 +51,19 @@ export default function Home() {
   const fetchData = useCallback(async () => {
     try {
       // setIsLoading(true)
-      await fetch(DUMMY_URL)
-      const posts: PostFeed[] = generateRandomPosts(oldestPostTime)
-      setOldestPostTime(posts[posts.length - 1].created_at)
-      setFeed((prev) => [...prev, ...posts])
+      if (online.online) {
+        await fetch(DUMMY_URL)
+        const posts: PostFeed[] = generateRandomPosts(oldestPostTime)
+        setOldestPostTime(posts[posts.length - 1].created_at)
+        setFeed((prev) => [...prev, ...posts])
+      }
     } catch (error) {
       console.error(error)
       setIsError(true)
     } finally {
       // setIsLoading(false)
     }
-  }, [setFeed, oldestPostTime, setOldestPostTime])
+  }, [setFeed, oldestPostTime, setOldestPostTime, online.online])
 
   useEffect(() => {
     async function addNewPosts() {
@@ -77,6 +83,17 @@ export default function Home() {
       fetchData()
     }
   }, [targetRef, fetchData, isIntersecting])
+
+  // useEffect(() => {
+  //   if (online.online && online.previous === false) {
+  //     toast.success(t('backOnline'))
+  //   } else if (!online.online && online.previous) {
+  //     toast.error(t('offline'), {
+  //     ...TOAST_OPTIONS,
+  //     autoClose: false,
+  //     })
+  //   }
+  // }, [t, online.online, online.previous])
 
   return (
     <>

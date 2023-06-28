@@ -1,14 +1,12 @@
 import { useEffect } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { useSetRecoilState } from 'recoil'
-import { I18nextProvider } from 'react-i18next'
+import { useSetRecoilState, useRecoilState } from 'recoil'
 import { ToastContainer } from 'react-toastify'
-import { useGeolocation } from 'react-use'
+import { useGeolocation, useNetworkState } from 'react-use'
+import { useTranslation } from 'react-i18next'
 import 'react-toastify/dist/ReactToastify.css'
 
-import i18n from './i18n'
-
-import { userLocationState } from './recoil/atoms/feedAtom'
+import { userLocationState, onlineAtomState } from './recoil/atoms/feedAtom'
 
 import Home from './pages/Home'
 import PostDetail from './pages/PostDetail'
@@ -33,7 +31,10 @@ const router = createBrowserRouter([
 ])
 
 function App() {
+  const { t } = useTranslation()
   const location = useGeolocation()
+  const onlineState = useNetworkState()
+  const [online, setOnline] = useRecoilState(onlineAtomState)
   const setLocation = useSetRecoilState(userLocationState)
 
   useEffect(() => {
@@ -49,15 +50,28 @@ function App() {
     }
   }, [location, setLocation])
 
-  console.log(location)
+  useEffect(() => {
+    setOnline({
+      online: onlineState?.online || false,
+      previous:
+        onlineState?.previous !== undefined ? onlineState?.previous : undefined,
+    })
+  }, [onlineState, setOnline])
 
   return (
-    <I18nextProvider i18n={i18n}>
+    <>
       <main className='flex min-h-screen w-full flex-col items-center p-4'>
         <RouterProvider router={router} />
       </main>
+      <div
+        className={`bg-red-500 transition-opacity text-white text-center fixed bottom-0 left-0 w-full h-12 flex items-center justify-center ${
+          online.online ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
+        <p>{t('offline')}</p>
+      </div>
       <ToastContainer />
-    </I18nextProvider>
+    </>
   )
 }
 

@@ -3,13 +3,18 @@ import { faker } from '@faker-js/faker'
 import { useTranslation } from 'react-i18next'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { formatDistanceToNow } from 'date-fns'
-
 import { useParams, Link } from 'react-router-dom'
-import { feedState, userLocationState } from '../recoil/atoms/feedAtom'
+import { toast } from 'react-toastify'
+
+import {
+  feedState,
+  userLocationState,
+  onlineAtomState,
+} from '../recoil/atoms/feedAtom'
 import { PostFeed } from '../types'
 import { handleDateFnLocale } from '../utils'
 
-import { MAX_CHARACTERS } from '../constants'
+import { MAX_CHARACTERS, TOAST_OPTIONS } from '../constants'
 import TextArea from '../components/TextArea'
 
 export default function PostDetail() {
@@ -18,6 +23,8 @@ export default function PostDetail() {
   const { postId } = useParams()
   const [feed, setFeed] = useRecoilState(feedState)
   const location = useRecoilValue(userLocationState)
+  const online = useRecoilValue(onlineAtomState)
+
   const [body, setBody] = useState('')
 
   const randomUsername = useMemo(() => {
@@ -30,33 +37,39 @@ export default function PostDetail() {
     return feed.find((post) => post.id === postId)
   }, [feed, postId])
 
-  const handleSubmit = () => {
-    if (postDetail) {
-      const updatedFeed = feed.map((post: PostFeed) => {
-        if (post.id === postId && post.replies !== undefined) {
-          return {
-            ...post,
-            replies: [
-              {
-                id: faker.string.uuid(),
-                body,
-                created_at: new Date().getTime(),
-                latitude: location.latitude !== null ? location.latitude : null,
-                longitude:
-                  location.longitude !== null ? location.longitude : null,
-                post_id: post.id,
-                username: randomUsername,
-              },
-              ...post.replies,
-            ],
+  const handleSubmit = async () => {
+    try {
+      if (postDetail && online.online) {
+        const updatedFeed = feed.map((post: PostFeed) => {
+          if (post.id === postId && post.replies !== undefined) {
+            return {
+              ...post,
+              replies: [
+                {
+                  id: faker.string.uuid(),
+                  body,
+                  created_at: new Date().getTime(),
+                  latitude:
+                    location.latitude !== null ? location.latitude : null,
+                  longitude:
+                    location.longitude !== null ? location.longitude : null,
+                  post_id: post.id,
+                  username: randomUsername,
+                },
+                ...post.replies,
+              ],
+            }
+          } else {
+            return post
           }
-        } else {
-          return post
-        }
-      })
+        })
 
-      setFeed(updatedFeed)
-      setBody('')
+        setFeed(updatedFeed)
+        setBody('')
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error(t('toast.generalError'), TOAST_OPTIONS)
     }
   }
 

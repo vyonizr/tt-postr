@@ -6,7 +6,11 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 
 import { DUMMY_URL, MAX_CHARACTERS, TOAST_OPTIONS } from '../constants'
-import { feedState, userLocationState } from '../recoil/atoms/feedAtom'
+import {
+  feedState,
+  userLocationState,
+  onlineAtomState,
+} from '../recoil/atoms/feedAtom'
 
 import TextArea from '../components/TextArea'
 
@@ -16,6 +20,7 @@ export default function NewPost() {
 
   const [feed, setFeed] = useRecoilState(feedState)
   const location = useRecoilValue(userLocationState)
+  const online = useRecoilValue(onlineAtomState)
 
   const [body, setBody] = useState('')
 
@@ -25,7 +30,7 @@ export default function NewPost() {
 
   const handleSubmit = async () => {
     try {
-      if (!isButtonDisabled) {
+      if (!isButtonDisabled && online.online) {
         const updatedFeed = [
           ...feed,
           {
@@ -42,12 +47,13 @@ export default function NewPost() {
         await fetch(DUMMY_URL)
 
         setFeed(updatedFeed)
-        toast.success('Post created successfully!', TOAST_OPTIONS)
+        toast.success(t('toast.postCreated'), TOAST_OPTIONS)
         setBody('')
         navigate('/')
       }
     } catch (error) {
-      toast.error('Something went wrong!', TOAST_OPTIONS)
+      console.error(error)
+      toast.error(t('toast.generalError'), TOAST_OPTIONS)
     }
   }
 

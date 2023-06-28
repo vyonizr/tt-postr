@@ -19,3 +19,11 @@ export const userLocationState = atom({
     longitude: null as number | null,
   },
 })
+
+export const onlineAtomState = atom({
+  key: 'Online',
+  default: {
+    online: navigator.onLine,
+    previous: undefined as boolean | undefined,
+  },
+})
