@@ -19,6 +19,7 @@
 ## Assumptions
 - Incoming posts not posted by the user are not real-time. The user has to refresh the page to see new posts
 - Single Page Application (SPA)
+- [pnpm](https://pnpm.io/) is used as package manager
 - Every auto-generated dummy post has a character length greater than 0, but none of them have exactly 100 characters
 - The timestamp of a post by current user is generated client-side
 - The user can reply to their own post
